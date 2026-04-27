@@ -1,9 +1,8 @@
 import express from 'express'
-import { getUsers, register } from './controllers/userController.js'
+import { register } from './controllers/auth.controller.js'
 const app = express()
 app.use(express.json())
 
-app.get('/users', getUsers)
 app.post('/users', register)
 
 app.listen(3000, () => {
