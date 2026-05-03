@@ -17,12 +17,10 @@ const authMiddleware = async (req, res, next) =>{
         }
 
         const decoded = jwt.verify(access_token, SECRET_KEY)
-        console.log(decoded)
         const user = await supabase 
             .from('User')
             .select('*')
             .eq('username', decoded.username)
-        console.log(user)
         if (!user) {
             return res.status(401).json({ error: "Unauthorized" });
         }
