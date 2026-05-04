@@ -61,8 +61,13 @@ export const login = async (req, res) => {
         const passwd = data[0].password
         const isMatch = await bcrypt.compare(req.body['password'], passwd)
         if (isMatch) {
-            const token = jwt.sign({username}, process.env.SECRET_KEY, { expiresIn: "2w" })
-            res.status(200).json({'access_token':token})
+            const token = jwt.sign(data[0], process.env.SECRET_KEY, { expiresIn: "1d" }) // signs the jwt using all user data
+            return res.status(200).cookie('token', token, {
+                httpOnly: true,
+                secure:process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                maxAge: 1000 * 60 * 60 * 24
+            }).json({'status':'success'})
         }
         else{
             throw new Error('Invalid credentials')
@@ -73,5 +78,11 @@ export const login = async (req, res) => {
 }
 
 export const logout = async (req, res) => {
-    
+    // console.log(jwt.verify(req.cookies.token, process.env.SECRET_KEY))
+    res.status(200).clearCookie('token', {
+        httpOnly: true,
+        secure:process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path : '/'
+    }).json({'status':'logged out'})
 }
