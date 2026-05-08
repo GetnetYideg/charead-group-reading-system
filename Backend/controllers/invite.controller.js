@@ -1,11 +1,20 @@
 import { supabase } from "../config/supabaseClient.js";
 import { joinGroup } from "./group.controller.js";
+import joi from 'joi'
+
+const inviteSchema = joi.object({
+    to_user_id: joi.int().required(),
+    group_id : joi.int().required()
+})
 
 export const sendInvitation = async (req, res) => {
     try {
         const from_user_id = req.user_id;
-        const to_user_id = req.params.user_id
-        const group_id = req.params.group_id
+
+        const { error: err, value } = inviteSchema.validate(req.body)
+        if (err) return res.status(400).json({error: "Invalid credentials"})
+
+        const { to_user_id, group_id } = req.body;
 
         const {data, error: dberror} = await supabase
             .from("Invitation")
