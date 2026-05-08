@@ -1,6 +1,6 @@
-import express from 'expres'
-import authMiddleware from '../middlewares/auth.midleware'
-import { acceptInvitations, getInvitations, sendInvitation } from '../controllers/invite.controller'
+import express from 'express'
+import authMiddleware from '../middlewares/auth.midleware.js'
+import { acceptInvitations, getInvitations, sendInvitation } from '../controllers/invite.controller.js'
 
 const invitationRouter = express.Router()
 
