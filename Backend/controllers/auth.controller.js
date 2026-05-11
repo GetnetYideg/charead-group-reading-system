@@ -3,6 +3,7 @@ import joi from 'joi'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv';
+import axios from 'axios';
 
 dotenv.config()
 const userSchema = joi.object({
@@ -24,6 +25,7 @@ const hashPasword = async (password) =>{
 
     return hash
 }
+
 export const register = async (req, res) => {
     try{
         const { first_name, last_name, email, password, username} = req.body
@@ -75,6 +77,58 @@ export const login = async (req, res) => {
     } catch (error) {
         res.status(500).json(error.message)
     }
+}
+
+export const githubOauth = async (req, res) => {
+    const githubURL = `https://github.com/login/oauth/authorize` +
+    `?client_id=${process.env.GITHUB_CLIENT_ID}` +
+    `&scope=user:email`
+    
+    res.redirect(githubURL)
+}
+
+export const githubOauthCallback = async (req, res) => {
+    const {code} = req.query
+    const postUrl = 'https://github.com/login/oauth/access_token'
+    try {
+        const tokenResponse = await axios.post(postUrl, {
+            client_id:process.env.GITHUB_CLIENT_ID,
+            client_secret:process.env.GITHUB_CLIENT_SECRET,
+            code
+        },
+        {
+            headers: {
+            Accept: "application/json",
+            },
+        })
+
+        const access_token = tokenResponse.data.access_token
+
+        const githubUser = await axios.get('https://api.github.com/user',{
+            headers : {
+                Authorization : `bearer ${access_token}`
+            }
+        })
+
+        const user = {
+            first_name:githubUser.data.name,
+            username:githubUser.data.login,
+            oauth_provider:'github',
+            oauth_provider_id:githubUser.data.id,
+            avatar_url:githubUser.data.avatar_url
+        }
+        console.log(githubUser)
+        const { data, error } = await supabase
+                                    .from("User")
+                                    .insert([user]).select()
+        res.status(201).json(data)
+    } catch (error) {
+        res.status(500).json(error.message)
+    }
+}
+
+export const googleOauth = async (req, res) => {
+
 }
 
 export const logout = async (req, res) => {
