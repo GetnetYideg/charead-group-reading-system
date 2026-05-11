@@ -3,19 +3,18 @@ import { joinGroup } from "./group.controller.js";
 import joi from 'joi'
 
 const inviteSchema = joi.object({
-    to_user_id: joi.int().required(),
-    group_id : joi.int().required()
+    to_user_id: joi.required(),
+    group_id : joi.required()
 })
 
 export const sendInvitation = async (req, res) => {
     try {
-        const from_user_id = req.user_id;
+        const from_user_id = req.user.id;
 
         const { error: err, value } = inviteSchema.validate(req.body)
         if (err) return res.status(400).json({error: "Invalid credentials"})
 
         const { to_user_id, group_id } = req.body;
-
         const {data, error: dberror} = await supabase
             .from("Invitation")
             .insert([{
@@ -36,7 +35,7 @@ export const sendInvitation = async (req, res) => {
 
 export const getInvitations = async (req, res) =>{
     try {
-        const user_id = req.user_id
+        const user_id = req.user.id
 
         const {data, error: dberror} = await supabase
             .from("Invitation")
@@ -56,7 +55,7 @@ export const getInvitations = async (req, res) =>{
 
 export const acceptInvitations = async (req, res) =>{
     try {
-        const user_id = req.user_id
+        const user_id = req.user.id
         const group_id = req.params.group_id
 
         await joinGroup(req, res);
@@ -79,7 +78,7 @@ export const acceptInvitations = async (req, res) =>{
 
 export const declineInvitation = async (req, res) => {
     try {
-        const user_id = req.user_id
+        const user_id = req.user.id
         const group_id = req.params.group_id
 
         const {data, error: dberror} = await supabase 
@@ -92,6 +91,7 @@ export const declineInvitation = async (req, res) => {
             throw new Error("Something is happend on the database")
         }
 
+        const user = await s
         res.status(200).json({message: "You declined the invitation"})
     } catch (error) {
         res.status(500).json(error.message)

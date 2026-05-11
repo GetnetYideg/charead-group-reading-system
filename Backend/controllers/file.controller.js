@@ -1,1 +1,1 @@
-import { supabase } from "../config/supabaseClient";invitationRouter
+import { supabase } from "../config/supabaseClient.js"
