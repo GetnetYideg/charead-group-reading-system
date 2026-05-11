@@ -11,11 +11,11 @@ import {
 
 const groupRouter = express.Router()
 
-groupRouter.post('/groups', authMiddleware, createGroup)
-groupRouter.get('/groups', authMiddleware, getUsersGroup)
-groupRouter.get('/groups/:id', authMiddleware, searchGroupsById)
-groupRouter.get('/groups/:slug', authMiddleware, searchGroups)
-groupRouter.post('/groups/:id/join', authMiddleware, joinGroup)
-groupRouter.delete('/groups/:id', authMiddleware, deleteGroup)
+groupRouter.post('/', authMiddleware, createGroup)
+groupRouter.get('/', authMiddleware, getUsersGroup)
+groupRouter.get('/:id', authMiddleware, searchGroupsById)
+groupRouter.get('/:slug', authMiddleware, searchGroups)
+groupRouter.post('/:id/join', authMiddleware, joinGroup)
+groupRouter.delete('/:id', authMiddleware, deleteGroup)
 
 export default groupRouter

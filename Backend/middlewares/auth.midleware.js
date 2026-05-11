@@ -9,15 +9,6 @@ const authMiddleware = async (req, res, next) =>{
     if(!token){
         return res.status(401).json({error: "unauthorized, first login to logout. 'What is light for him, as he never saw darkness'-master ougway."})
     }
-    
-    // if(!auth_header || !auth_header.startsWith("Bearer ")){
-    //     return res.status(401).json( {error: "invalid token format"})
-    // }
-    // const access_token = auth_header.split(" ")[1]
-
-    // if (!access_token){
-    //      return res.status(401).json({error: "access token not found"})
-    // }
     try{
         const decoded = jwt.verify(token, SECRET_KEY)
         const user = await supabase
