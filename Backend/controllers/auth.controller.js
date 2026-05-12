@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv';
 import axios from 'axios';
+import { token } from 'morgan';
 
 dotenv.config()
 const userSchema = joi.object({
@@ -128,7 +129,50 @@ export const githubOauthCallback = async (req, res) => {
 }
 
 export const googleOauth = async (req, res) => {
+    const googleURL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=http://localhost:3000/api/auth/oauth/google/callback/&response_type=code&scope=openid%20email%20profile`
+    res.redirect(googleURL)
+}
 
+export const googleOauthCallback = async (req, res) => {
+    const code = req.query.code
+    try {
+        const tokenResponse = await axios.post('https://oauth2.googleapis.com/token', {
+            client_id:process.env.GOOGLE_CLIENT_ID,
+            client_secret:process.env.GOOGLE_CLIENT_SECRET,
+            code,
+            redirect_uri:'http://localhost:3000/api/auth/oauth/google/callback/',
+            grant_type: "authorization_code",
+        },
+        {
+            headers:{
+                Accept:'application/json'
+            }
+        })
+
+        const access_token = tokenResponse.data.access_token
+
+        const googleUser = await axios.get('https://openidconnect.googleapis.com/v1/userinfo', {
+            headers:{
+                Authorization:`Bearer ${access_token}`
+            }
+        })
+
+        const user = {
+            first_name:googleUser.data.given_name,
+            last_name:googleUser.data.family_name,
+            email:googleUser.data.email,
+            username:googleUser.data.email.split('@')[0],
+            oauth_provider:'google',
+            oauth_provider_id:googleUser.data.sub,
+            avatar_url:googleUser.data.picture
+        }
+        const { data, error } = await supabase
+                                    .from("User")
+                                    .insert([user]).select()
+        res.status(201).json(data)
+    } catch (error) {
+        res.status(500).json(error)
+    }
 }
 
 export const logout = async (req, res) => {

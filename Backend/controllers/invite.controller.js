@@ -3,8 +3,8 @@ import { joinGroup } from "./group.controller.js";
 import joi from 'joi'
 
 const inviteSchema = joi.object({
-    to_user_id: joi.int().required(),
-    group_id : joi.int().required()
+    to_user_id: joi.number().required(),
+    group_id : joi.number().required()
 })
 
 export const sendInvitation = async (req, res) => {
