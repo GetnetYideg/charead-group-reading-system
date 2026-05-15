@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv';
 import axios from 'axios';
+import { token } from 'morgan';
 
 dotenv.config()
 const userSchema = joi.object({
@@ -24,6 +25,13 @@ const hashPasword = async (password) =>{
     const hash = await bcrypt.hash(password, saltRounds)
 
     return hash
+}
+
+const randomNDigits = (n) => {
+  const min = Math.pow(10, n - 1)
+  const max = Math.pow(10, n) - 1
+
+  return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
 export const register = async (req, res) => {
@@ -69,7 +77,7 @@ export const login = async (req, res) => {
                 secure:process.env.NODE_ENV === 'production',
                 sameSite: 'lax',
                 maxAge: 1000 * 60 * 60 * 24
-            }).json({'status':'success'})
+            }).json({'status':'logged in'})
         }
         else{
             throw new Error('Invalid credentials')
@@ -109,7 +117,7 @@ export const githubOauthCallback = async (req, res) => {
                 Authorization : `bearer ${access_token}`
             }
         })
-
+        
         const user = {
             first_name:githubUser.data.name,
             username:githubUser.data.login,
@@ -117,18 +125,108 @@ export const githubOauthCallback = async (req, res) => {
             oauth_provider_id:githubUser.data.id,
             avatar_url:githubUser.data.avatar_url
         }
-        console.log(githubUser)
-        const { data, error } = await supabase
-                                    .from("User")
-                                    .insert([user]).select()
-        res.status(201).json(data)
+        const { data:userFromDB } = await supabase
+                                    .from('User')
+                                    .select('*')
+                                    .eq('username',user.username)
+                                    .limit(1)
+        if (userFromDB.data){
+            const token = jwt.sign(user, process.env.SECRET_KEY, { expiresIn: "1d" }) // signs the jwt using all user data
+            return res.status(200).cookie('token', token, {
+                httpOnly: true,
+                secure:process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                maxAge: 1000 * 60 * 60 * 24
+            }).json({'status':'logged in', data:userFromDB})
+        }else{
+            const { data, error } = await supabase
+                                        .from("User")
+                                        .insert([user]).select()
+            if(error) throw new Error(error.message)
+            const token = jwt.sign(user, process.env.SECRET_KEY, { expiresIn: "1d" }) // signs the jwt using all user data
+            return res.status(200).cookie('token', token, {
+                httpOnly: true,
+                secure:process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                maxAge: 1000 * 60 * 60 * 24
+            }).json({'status':'registered and logged in',data:user})
+        }
     } catch (error) {
         res.status(500).json(error.message)
     }
 }
 
 export const googleOauth = async (req, res) => {
+    const googleURL = `https://accounts.google.com/o/oauth2/v2/auth?` +
+    `client_id=${process.env.GOOGLE_CLIENT_ID}&` +
+    `redirect_uri=http://localhost:3000/api/auth/oauth/google/callback/&r` +
+    `esponse_type=code&` +
+    `scope=openid%20email%20profile`
+    res.redirect(googleURL)
+}
 
+export const googleOauthCallback = async (req, res) => {
+    const code = req.query.code
+    try {
+        const tokenResponse = await axios.post('https://oauth2.googleapis.com/token', {
+            client_id:process.env.GOOGLE_CLIENT_ID,
+            client_secret:process.env.GOOGLE_CLIENT_SECRET,
+            code,
+            redirect_uri:'http://localhost:3000/api/auth/oauth/google/callback/',
+            grant_type: "authorization_code",
+        },
+        {
+            headers:{
+                Accept:'application/json'
+            }
+        })
+
+        const access_token = tokenResponse.data.access_token
+
+        const googleUser = await axios.get('https://openidconnect.googleapis.com/v1/userinfo', {
+            headers:{
+                Authorization:`Bearer ${access_token}`
+            }
+        })
+        // console.log(tokenResponse)
+        const user = {
+            first_name:googleUser.data.given_name,
+            last_name:googleUser.data.family_name,
+            email:googleUser.data.email,
+            username:googleUser.data.email.split('@')[0] + randomNDigits(5),
+            oauth_provider:'google',
+            oauth_provider_id:googleUser.data.sub,
+            avatar_url:googleUser.data.picture
+        }
+        const { data:userFromDB } = await supabase
+                                    .from('User')
+                                    .select('*')
+                                    .eq('username',user.username)
+                                    .limit(1)
+        if (userFromDB){
+            const token = jwt.sign(user, process.env.SECRET_KEY, { expiresIn: "1d" }) // signs the jwt using all user data
+            return res.status(200).cookie('token', token, {
+                httpOnly: true,
+                secure:process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                maxAge: 1000 * 60 * 60 * 24
+            }).json({'status':'logged in', data:userFromDB})
+        }else{
+            const { data, error } = await supabase
+                                        .from("User")
+                                        .insert([user]).select()
+            if(error) throw new Error(error.message)
+            const token = jwt.sign(user, process.env.SECRET_KEY, { expiresIn: "1d" }) // signs the jwt using all user data
+            return res.status(200).cookie('token', token, {
+                httpOnly: true,
+                secure:process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                maxAge: 1000 * 60 * 60 * 24
+            }).json({'status':'registered and logged in', data:user})
+        }
+    } catch (error) {
+        res.status(500).json(error)
+    }
 }
 
 export const logout = async (req, res) => {

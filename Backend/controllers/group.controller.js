@@ -17,16 +17,25 @@ export const createGroup = async(req, res) =>{
 
         const owner_id = req.user.id 
 
-        const { data, error: dberror } = await supabase
+        const { data , error:groupError } = await supabase
             .from("Group")
             .insert([{
                 name, 
                 member_count,
                 slug,
                 owner_id
+            }]).select();
+        if (groupError) throw new Error (groupError.message)
+        const groupId = data[0].id
+
+        const { data:memberData, error:memberError } = await supabase
+            .from('Member')
+            .insert([{
+                user_id:owner_id,
+                group_id:groupId,
+                is_admin:true
             }]).select()
-        if (dberror) throw new Error (dberror.message)
-        
+        if (memberError) throw new Error (memberError.message)
         res.status(201).json(data)
     }catch(error){
         res.status(500).json(error.message)
