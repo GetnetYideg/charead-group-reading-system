@@ -91,7 +91,6 @@ export const declineInvitation = async (req, res) => {
             throw new Error("Something is happend on the database")
         }
 
-        const user = await s
         res.status(200).json({message: "You declined the invitation"})
     } catch (error) {
         res.status(500).json(error.message)
