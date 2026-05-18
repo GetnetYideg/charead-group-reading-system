@@ -1,6 +1,13 @@
 import express from 'express'
-import { register, login , logout, githubOauth, githubOauthCallback, googleOauth, googleOauthCallback } from '../controllers/auth.controller.js'
-import authMiddleware from '../middlewares/auth.midleware.js'
+import { 
+    register, 
+    login, 
+    logout, 
+    githubOauth, 
+    githubOauthCallback, 
+    googleOauth, 
+    googleOauthCallback } from '../controllers/auth.controller.js'
+import authMiddleware from '../middlewares/auth.middleware.js'
 
 const authRouter = express.Router()
 

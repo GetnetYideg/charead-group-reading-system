@@ -11,12 +11,12 @@ const authMiddleware = async (req, res, next) =>{
     }
     try{
         const decoded = jwt.verify(token, SECRET_KEY)
-        const user = await supabase
+        const { data:user } = await supabase
             .from('User')
             .select('is_active')
             .eq('username', decoded.username)
             .limit(1)
-        if (!user || !user.data[0].is_active) {
+        if (!user || user.is_active == false) {
             return res.status(401).json({ error: "Unauthorized" });
         }
         req.user = decoded // attaches all the user data that is used to sign the jwt to the request

@@ -131,6 +131,7 @@ export const githubOauthCallback = async (req, res) => {
                                     .eq('username',user.username)
                                     .limit(1)
         if (userFromDB.data){
+            user["id"] = userFromDB.data[0].id
             const token = jwt.sign(user, process.env.SECRET_KEY, { expiresIn: "1d" }) // signs the jwt using all user data
             return res.status(200).cookie('token', token, {
                 httpOnly: true,
@@ -204,6 +205,7 @@ export const googleOauthCallback = async (req, res) => {
                                     .eq('username',user.username)
                                     .limit(1)
         if (userFromDB){
+            user["id"] = userFromDB.data[0].id
             const token = jwt.sign(user, process.env.SECRET_KEY, { expiresIn: "1d" }) // signs the jwt using all user data
             return res.status(200).cookie('token', token, {
                 httpOnly: true,
