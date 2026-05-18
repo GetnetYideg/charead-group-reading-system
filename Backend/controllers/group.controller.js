@@ -189,10 +189,23 @@ export const deleteGroup = async (req, res) =>{
 
 export const listFiles = async (req, res) => {
     const slug = req.params.slug
-    if (!group_id) return res.status(400).json({message:"group id is required"})
+    if (!slug) return res.status(400).json({message:"slug is required"})
+
     try {
+        const {data:groupId} = await supabase
+            .from('Group')
+            .select('id')
+            .eq('slug', slug)
+            .maybeSingle()
+
+        if (!groupId) return res.status(404).json({message:'group not found'})
         
+        const { data:filesData } = await supabase
+            .from('File')
+            .select('*')
+            .eq('group_id', groupId.id)
+        return res.status(200).json(filesData)
     } catch (error) {
-        
+        res.status(500).json(error.message)
     }
 }

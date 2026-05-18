@@ -20,10 +20,8 @@ const loginSchema = joi.object({
     password: joi.string().min(8).required().max(20)
 })
 
-const hashPasword = async (password) =>{
-    const saltRounds = 10
-    const hash = await bcrypt.hash(password, saltRounds)
-
+export const hashPasword = async (hashable) =>{
+    const hash = await bcrypt.hash(hashable, parseInt(process.env.SALT_ROUNDS))
     return hash
 }
 
