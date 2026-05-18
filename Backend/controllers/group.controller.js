@@ -12,9 +12,29 @@ export const createGroup = async(req, res) =>{
         const { error: err, value } = userSchema.validate(req.body)
         if (err) return res.status(400).json({error: "Name is not correct"})
 
-        const slug = slugify(name, { lower: true, strict: true });
-        const member_count = 1;
+        let slug = slugify(name, { lower: true, strict: true });
+        const {data:groups, error: dberror} = await supabase
+            .from("Group")
+            .select("*")
+            .ilike("slug",`${slug}%`)
+        
+        if (dberror){
+            throw new Error(dberror.message)
+        }
+        const regexPattern = new RegExp(`^${slug}(-[0-9]+)?$`)
+        const existingGroups = groups
+                        .filter(g => regexPattern.test(g.slug))
+                        .map(g => g.slug)
+    
+        if (existingGroups.length > 0){ //generate unique slug
+            let counter = 0
+            for(let g of existingGroups){
+                counter++
+            }
+            slug = slug + `-${counter}`
+        }
 
+        const member_count = 1;
         const owner_id = req.user.id 
 
         const { data , error:groupError } = await supabase
@@ -66,7 +86,7 @@ export const searchGroups = async (req, res) => {
         const {data, error: dberror} = await supabase
             .from("Group")
             .select("*")
-            .eq("slug", slug)
+            .ilike("slug", `%${slug}%`)
         
         if (dberror){
             throw new Error(dberror.message)
@@ -164,5 +184,15 @@ export const deleteGroup = async (req, res) =>{
 
     } catch (error) {
         res.status(500).json(error.message)
+    }
+}
+
+export const listFiles = async (req, res) => {
+    const slug = req.params.slug
+    if (!group_id) return res.status(400).json({message:"group id is required"})
+    try {
+        
+    } catch (error) {
+        
     }
 }

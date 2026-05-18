@@ -53,10 +53,6 @@ export const uploadFile = async (req, res) => {
     }
 }
 
-export const listFiles = async (req, res) => {
-
-}
-
 export const getFileMetadata = async (req, res) => {
 
 }
