@@ -20,7 +20,7 @@ const authMiddleware = async (req, res, next) =>{
             return res.status(401).json({ error: "Unauthorized" });
         }
         req.user = decoded // attaches all the user data that is used to sign the jwt to the request
-
+        
         next();
 
     }catch(error){

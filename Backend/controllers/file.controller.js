@@ -1,6 +1,5 @@
 import { supabase } from "../config/supabaseClient.js";
 import path from "path";
-import { v4 as uuidv4 } from "uuid";
 import crypto from "crypto";
 
 const hashFile = async (fileBuffer) => {
@@ -16,7 +15,7 @@ export const uploadFile = async (req, res) => {
         const document = JSON.parse(req.body.document)
         const group_id = document.group_id
 
-        const { data, error:dberror } = await supabase
+        const { data:member, error:dberror } = await supabase
                             .from('Member')
                             .select('is_admin')
                             .eq('user_id', req.user.id)
@@ -24,7 +23,7 @@ export const uploadFile = async (req, res) => {
                             .maybeSingle()
         
         if (dberror) throw new Error(dberror)
-        if (!data || !data.is_admin) return res.status(403).json({message:"unauthorized, you cant upload files to this group"});
+        if (!member || !member.is_admin) return res.status(403).json({message:"unauthorized, you cant upload files to this group"});
         
         const file = req.file
         const originalName = file.originalname
@@ -96,11 +95,56 @@ export const uploadFile = async (req, res) => {
 }
 
 export const getFileMetadata = async (req, res) => {
-
+    try {
+        const fileId = req.params.id
+        
+        const { data:fileData, error} = await supabase
+                .from('File')
+                .select('*')
+                .eq('id', fileId)
+        
+        if(!fileData) return res.status(403).json({error:"file not found"})
+        return res.status(200).json({data:fileData})
+    } catch (error) {
+        return res.status(500).json({error:error})
+    }
+    
 }
 
 export const downloadFile = async (req, res) => {
+    try {
+        const fileId = req.params.id
+        
+        const { data:fileData, error:err } = await supabase
+                .from('File')
+                .select('*')
+                .eq('id', fileId)
+                .maybeSingle()
+        if(err) return res.json({error:err})
+        if(!fileData) return res.status(403).json({error:"file not found"})
+        
+        const {data:fileBuffer, error} = await supabase.storage
+                .from('ChaRead - avatar and books')
+                .download(`books/${fileData.stored_name}`)
+        
+        if(error) return res.json({error:error})
+        
+        res.setHeader('Content-Type', fileBuffer.type || 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileData.original_name)}"`);
 
+        const stream = fileBuffer.stream()
+        const reader = stream.getReader()
+        
+        while (true){
+            const { done, value } = await reader.read()
+            if (done) break;
+            res.write(value)
+        }
+        
+        res.end()
+    } catch (error) {
+        return res.status(500).json({error:error})
+    }
 }
 
 export const deleteFile = async (req, res) => {
