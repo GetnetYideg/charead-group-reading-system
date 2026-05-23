@@ -6,6 +6,7 @@ import authRouter from './routes/auth.routes.js'
 import invitationRouter from './routes/invite.routes.js';
 import fileRouter from './routes/file.routes.js'
 import chatRouter from './routes/chat.routes.js';
+import aiRouter from './routes/ai.routes.js';
 
 const port = process.env.PORT
 const app = express()
@@ -18,6 +19,7 @@ app.use('/api/auth', authRouter)
 app.use('/api/invites', invitationRouter)
 app.use('/api/file', fileRouter)
 app.use('/api/chat', chatRouter)
+app.use('/api/ai', aiRouter)
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
