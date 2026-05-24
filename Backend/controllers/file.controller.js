@@ -1,6 +1,7 @@
 import { supabase } from "../config/supabaseClient.js";
 import path from "path";
 import crypto from "crypto";
+import { error } from "console";
 
 const hashFile = async (fileBuffer) => {
     return crypto
@@ -148,5 +149,46 @@ export const downloadFile = async (req, res) => {
 }
 
 export const deleteFile = async (req, res) => {
+    try{
+        const user_id = req.user.id
+        const group_id = req.body.group_id
 
+        const { data:memberData } = await supabase
+                .from('Member')
+                .select('is_admin')
+                .eq('user_id', user_id)
+                .eq('group_id', group_id)
+                .maybeSingle()
+        if (!memberData || !memberData.is_admin) return res.status(403).json({message:memberData})
+        
+        const fileId = req.params.id
+        
+        const { data:metadata } = await supabase
+                .from('File')
+                .select('*')
+                .eq('id', fileId)
+                .maybeSingle()
+        if(!metadata) return res.status(404).json({message:"File not found"});
+        const { data:sameFiles } = await supabase
+                .from('File')
+                .select('id')
+                .eq('hash', metadata.hash)
+        
+        if(sameFiles.length == 1){
+            const { data:storageDeleteData, error:storageDeleteError } = await supabase.storage
+                .from('ChaRead - avatar and books')
+                .remove(`books/${metadata.stored_name}`)
+            if(storageDeleteError) throw new Error(storageDeleteError)
+            
+        } 
+        
+        const { data:dbDeleteData,error:dbDeleteError } = await supabase
+                .from('File')
+                .delete()
+                .eq('id', fileId)
+        if(dbDeleteError){console.log(dbDeleteError); throw new Error(dbDeleteError)}
+        return res.status(200).json({message:"deleted", data:dbDeleteData})
+    }catch (error){
+        res.status(400).json({error:error})
+    }
 }

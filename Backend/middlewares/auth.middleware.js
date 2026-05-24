@@ -15,8 +15,8 @@ const authMiddleware = async (req, res, next) =>{
             .from('User')
             .select('is_active')
             .eq('username', decoded.username)
-            .limit(1)
-        if (!user || user.is_active == false) {
+            .maybeSingle()
+        if (!user || !user.is_active) {
             return res.status(401).json({ error: "Unauthorized" });
         }
         req.user = decoded // attaches all the user data that is used to sign the jwt to the request

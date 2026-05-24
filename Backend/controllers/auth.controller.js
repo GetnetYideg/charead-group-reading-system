@@ -75,7 +75,7 @@ export const login = async (req, res) => {
                 secure:process.env.NODE_ENV === 'production',
                 sameSite: 'lax',
                 maxAge: 1000 * 60 * 60 * 24
-            }).json({'status':'logged in'})
+            }).json({'status':'logged in',data:data[0]})
         }
         else{
             throw new Error('Invalid credentials')

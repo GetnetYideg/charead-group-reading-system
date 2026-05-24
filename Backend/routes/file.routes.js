@@ -14,9 +14,9 @@ import {
 
 const fileRouter = express.Router()
 
-fileRouter.post('/upload', authMiddleware, isAdminMiddleware, upload, uploadFile)
+fileRouter.post('/upload', authMiddleware, upload, uploadFile)
 fileRouter.get('/metadata/:id', authMiddleware, getFileMetadata)
-fileRouter.get('/download/:id', downloadFile)
-fileRouter.delete('/delete/:id', authMiddleware, isAdminMiddleware, isMemberMiddleware, deleteFile)
+fileRouter.get('/download/:id',authMiddleware, downloadFile)
+fileRouter.delete('/delete/:id', authMiddleware, deleteFile)
 
 export default fileRouter
