@@ -64,11 +64,27 @@ export const createGroup = async(req, res) =>{
 
 export const getUsersGroup = async (req, res) => {
     try {
-        const owner_id = req.user.id
+        const user_id = req.user.id
+        
+        // First get all group IDs the user is a member of
+        const { data: memberData, error: memberErr } = await supabase
+            .from("Member")
+            .select("group_id")
+            .eq("user_id", user_id)
+            
+        if (memberErr) throw new Error(memberErr.message)
+        
+        if (!memberData || memberData.length === 0) {
+            return res.status(200).json([])
+        }
+        
+        const groupIds = memberData.map(m => m.group_id)
+
+        // Then fetch those groups
         const {data, error: dberror } = await supabase
             .from("Group")
             .select("*")
-            .eq("owner_id", owner_id)
+            .in("id", groupIds)
 
         if (dberror){
              throw new Error (dberror.message)
@@ -83,7 +99,7 @@ export const getUsersGroup = async (req, res) => {
 export const searchGroups = async (req, res) => {
     try {
         const slug = req.params.slug
-        const {data, error: dberror} = await supabase
+        const { data:groupData, error: dberror} = await supabase
             .from("Group")
             .select("*")
             .ilike("slug", `%${slug}%`)
@@ -92,23 +108,25 @@ export const searchGroups = async (req, res) => {
             throw new Error(dberror.message)
         }
 
-        res.status(200).json(data)
+        res.status(200).json(groupData)
     } catch (error) {
         res.status(500).json(error.message)
     }
 }
 
-export const searchGroupsById = async (req, res) => {
+export const getGroup = async (req, res) => {
     try {
-        const group_id = req.params.id
+        const slug = req.params.slug
         const { data, error: dberror } = await supabase
             .from("Group")
             .select("*")
-            .eq("id", group_id)
+            .eq("slug", slug)
+            .maybeSingle()
         
         if (dberror){
             throw new Error( dberror.message )
         }
+        
 
         res.status(200).json(data)
     } catch (error) {
@@ -116,11 +134,37 @@ export const searchGroupsById = async (req, res) => {
     }
 }
 
+
 export const joinGroup = async (req, res) =>{
     try {
         const user_id = req.user.id
-        const group_id = req.params.id
+        const slug = req.params.slug
+        
+        // Find group by slug
+        const { data: groupData, error: groupErr } = await supabase
+            .from("Group")
+            .select("id")
+            .eq("slug", slug)
+            .maybeSingle()
+            
+        if (groupErr || !groupData) {
+            return res.status(404).json({ message: groupErr?.message || "Group not found" })
+        }
+        
+        const group_id = groupData.id
         const is_admin = false
+
+        // Check if already a member
+        const { data: existingMember } = await supabase
+            .from("Member")
+            .select("id")
+            .eq("user_id", user_id)
+            .eq("group_id", group_id)
+            .maybeSingle()
+            
+        if (existingMember) {
+            return res.status(400).json({ message: "You are already a member of this group" })
+        }
 
         const { data, error: dberror } = await supabase 
             .from("Member")
@@ -132,6 +176,17 @@ export const joinGroup = async (req, res) =>{
         
         if(dberror){
             throw new Error( dberror.message)
+        }
+
+        // Also increment member count in Group table
+        const { data: groupUpdate } = await supabase
+            .from("Group")
+            .select("member_count")
+            .eq("id", group_id)
+            .single()
+            
+        if (groupUpdate) {
+            await supabase.from("Group").update({ member_count: (groupUpdate.member_count || 1) + 1 }).eq("id", group_id)
         }
 
         res.status(201).json(data)

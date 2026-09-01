@@ -3,6 +3,7 @@ import {
     register, 
     login, 
     logout, 
+    getMe,
     githubOauth, 
     githubOauthCallback, 
     googleOauth, 
@@ -12,11 +13,12 @@ import authMiddleware from '../middlewares/auth.middleware.js'
 const authRouter = express.Router()
 
 authRouter.post('/register', register, )
-authRouter.post('/oauth/github', githubOauth)
+authRouter.get('/oauth/github', githubOauth)
 authRouter.get('/oauth/github/callback', githubOauthCallback)
-authRouter.post('/oauth/google', googleOauth)
+authRouter.get('/oauth/google', googleOauth)
 authRouter.get('/oauth/google/callback', googleOauthCallback)
 authRouter.post('/login', login)
-authRouter.post('/logout', authMiddleware,logout)
+authRouter.post('/logout', authMiddleware, logout)
+authRouter.get('/me', getMe)
 
 export default authRouter

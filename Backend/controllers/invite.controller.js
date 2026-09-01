@@ -39,7 +39,7 @@ export const getInvitations = async (req, res) =>{
 
         const {data, error: dberror} = await supabase
             .from("Invitation")
-            .select("*")
+            .select("id, to_user_id, from_user_id!inner(first_name, last_name, username), group_id!inner(id,slug)")
             .eq("to_user_id", user_id)
         
         if (dberror){
@@ -57,10 +57,40 @@ export const acceptInvitations = async (req, res) =>{
     try {
         const user_id = req.user.id
         const group_id = req.params.group_id
+        const is_admin = false
 
-        await joinGroup(req, res);
+        // await joinGroup(req, res);
+        const { data:groupData, error:groupErr } = await supabase
+        .from('Group')
+        .select('*')
+        .eq('id', group_id)
+        .maybeSingle()
+        
+        if(!groupData || groupErr) throw new Error(groupErr?.message || "Group not Found")
+        
+        const { data:memberData, error: memberError } = await supabase 
+            .from("Member")
+            .insert([{
+                user_id,
+                group_id,
+                is_admin
+            }]).select()
+        
+        if(memberError){
+            throw new Error( memberError.message)
+        }
 
-        const { data, error: dberror } = supabase
+        const { data: groupUpdate } = await supabase
+            .from("Group")
+            .select("member_count")
+            .eq("id", group_id)
+            .single()
+            
+        if (groupUpdate) {
+            await supabase.from("Group").update({ member_count: (groupUpdate.member_count || 1) + 1 }).eq("id", group_id)
+        }
+        
+        const { data, error: dberror } = await supabase
             .from("Invitation")
             .delete()
             .eq("to_user_id", user_id)
