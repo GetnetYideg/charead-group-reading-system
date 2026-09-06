@@ -1,4 +1,4 @@
-.chat-main { display: flex; flex-direction: row; overflow: hidden; height: calc(100vh); }
+.chat-main { flex: 1; display: flex; flex-direction: row; overflow: hidden; }
 .chat-layout { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
 .chat-messages-area {

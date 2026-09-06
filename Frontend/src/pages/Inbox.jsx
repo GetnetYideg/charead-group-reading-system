@@ -25,7 +25,7 @@ export default function Inbox() {
   const handleAccept = async (invite) => {
     setProcessing(p => ({ ...p, [invite.id]: 'accept' }))
     try {
-      await acceptInvitation(invite.group_id)
+      await acceptInvitation(invite.group_id.id)
       addToast('You joined the group!', 'success')
       setInvites(i => i.filter(x => x.id !== invite.id))
     } catch (err) {
@@ -37,7 +37,7 @@ export default function Inbox() {
   const handleDecline = async (invite) => {
     setProcessing(p => ({ ...p, [invite.id]: 'decline' }))
     try {
-      await declineInvitation(invite.group_id)
+      await declineInvitation(invite.group_id.id)
       addToast('Invitation declined', 'info')
       setInvites(i => i.filter(x => x.id !== invite.id))
     } catch { addToast('Fail?to_user_id=46&group_id&=20ed to decline invitation', 'error') }

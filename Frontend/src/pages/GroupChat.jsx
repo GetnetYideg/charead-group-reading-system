@@ -133,14 +133,15 @@ export default function GroupChat() {
   return (
     <div className="app-layout">
       <Sidebar />
-      <div className="main-content chat-main">
+      <div className="main-content">
         <TopBar title={group?.name || 'Group Chat'} badge={`${totalMembers} Members`} searchPlaceholder="Search discussion…">
           <button className="btn btn-outline btn-sm" onClick={() => navigate(`/groups/${slug}`)}>
             <ArrowLeft size={14}/> Workspace
           </button>
         </TopBar>
 
-        <div className="chat-layout">
+        <div className="chat-main">
+          <div className="chat-layout">
           {/* Messages */}
           <div className="chat-messages-area">
             {loading ? (
@@ -257,6 +258,7 @@ export default function GroupChat() {
             </p>
           </div>
         </div>
+      </div>
       </div>
     </div>
   )
