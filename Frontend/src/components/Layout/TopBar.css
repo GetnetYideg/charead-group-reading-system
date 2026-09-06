@@ -1,93 +1,508 @@
+
+
 .topbar {
+  min-height: 72px;
+
+  width: 100%;
+
+  padding:
+    0 28px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 28px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+
+  gap: 20px;
+
+  background: var(
+    --surface,
+    #ffffff
+  );
+
+  border-bottom: 1px solid var(
+    --border,
+    #e7e5eb
+  );
+
   position: sticky;
+
   top: 0;
-  z-index: 100;
+
+  z-index: 900;
+
+  box-sizing: border-box;
 }
 
+
+/* =========================================
+   LEFT SIDE
+========================================= */
+
 .topbar-left {
+  min-width: 0;
+
   display: flex;
   align-items: center;
+
   gap: 12px;
 }
 
-.topbar-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text);
+.topbar-heading {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  min-width: 0;
 }
+
+
+/* =========================================
+   TITLE
+========================================= */
+
+.topbar-title {
+  margin: 0;
+
+  color: var(
+    --text,
+    #17151a
+  );
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+  line-height: 1.2;
+
+  letter-spacing: -0.4px;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+
+/* =========================================
+   BADGE
+========================================= */
 
 .topbar-badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  background: #D1FAE5;
-  color: #065F46;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 99px;
+
+  gap: 6px;
+
+  flex-shrink: 0;
+
+  padding:
+    4px 10px;
+
+  background: #d1fae5;
+
+  color: #065f46;
+
+  font-size: 10.5px;
+
+  font-weight: 650;
+
+  line-height: 1;
+
+  border-radius: 999px;
 }
 
 .topbar-badge::before {
   content: '';
-  display: inline-block;
+
   width: 6px;
   height: 6px;
+
+  flex-shrink: 0;
+
   border-radius: 50%;
-  background: #10B981;
+
+  background: #10b981;
 }
+
+
+/* =========================================
+   RIGHT SIDE
+========================================= */
 
 .topbar-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+
+  justify-content: flex-end;
+
+  gap: 7px;
+
+  flex-shrink: 0;
 }
 
+
+/* =========================================
+   SEARCH
+========================================= */
+
 .topbar-search {
+  height: 36px;
+
+  min-width: 0;
+
   display: flex;
   align-items: center;
+
   gap: 8px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 7px 12px;
-  color: var(--text-muted);
+
+  padding:
+    0 11px;
+
+  background: var(
+    --bg,
+    #f8f6fb
+  );
+
+  border: 1px solid var(
+    --border,
+    #e7e5eb
+  );
+
+  border-radius: 9px;
+
+  color: var(
+    --text-muted,
+    #99939f
+  );
+
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.topbar-search:focus-within {
+  background: var(
+    --surface,
+    #ffffff
+  );
+
+  border-color: #c4b5fd;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(124, 58, 237, 0.08);
 }
 
 .topbar-search input {
-  border: none;
-  background: transparent;
-  outline: none;
-  font-size: 13px;
-  color: var(--text);
   width: 180px;
+
+  min-width: 0;
+
+  border: none;
+
+  outline: none;
+
+  background: transparent;
+
+  color: var(
+    --text,
+    #17151a
+  );
+
+  font-size: 12.5px;
+
+  font-family: inherit;
 }
 
 .topbar-search input::placeholder {
-  color: var(--text-muted);
+  color: var(
+    --text-muted,
+    #99939f
+  );
 }
 
+
+/* =========================================
+   ICON BUTTONS
+========================================= */
+
 .topbar-icon {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
+
+  padding: 0;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  color: var(--text-secondary);
+
+  border: 1px solid transparent;
+
+  border-radius: 9px;
+
+  background: transparent;
+
+  color: var(
+    --text-secondary,
+    #6f6975
+  );
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.15s ease;
 }
+
+.topbar-icon:hover {
+  background: var(
+    --bg,
+    #f7f5fa
+  );
+
+  border-color: var(
+    --border,
+    #e7e5eb
+  );
+
+  color: var(
+    --text,
+    #17151a
+  );
+}
+
+.topbar-icon:active {
+  transform: scale(0.94);
+}
+
+.topbar-icon:focus-visible {
+  outline: 2px solid var(
+    --accent-purple,
+    #7c3aed
+  );
+
+  outline-offset: 2px;
+}
+
+
+/* =========================================
+   AVATAR BUTTON
+========================================= */
+
+.topbar-avatar-button {
+  width: 38px;
+  height: 38px;
+
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+
+  background: transparent;
+
+  border-radius: 50%;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.18s ease;
+}
+
+.topbar-avatar-button:hover {
+  transform: scale(1.04);
+}
+
+.topbar-avatar-button:active {
+  transform: scale(0.96);
+}
+
+.topbar-avatar-button:focus-visible {
+  outline: 2px solid var(
+    --accent-purple,
+    #7c3aed
+  );
+
+  outline-offset: 2px;
+}
+
+
+/* =========================================
+   TOPBAR AVATAR
+========================================= */
 
 .topbar-avatar {
   width: 34px;
   height: 34px;
-  font-size: 13px;
-  background: var(--brand-faint);
-  color: var(--brand);
+
+  font-size: 11.5px;
+
   font-weight: 700;
+
+  background: var(
+    --brand-faint,
+    #f0e8ff
+  );
+
+  color: var(
+    --brand,
+    #6d28d9
+  );
+
+  border: 1px solid
+    rgba(109, 40, 217, 0.08);
+
+  overflow: hidden;
+}
+
+.topbar-avatar img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+
+  border-radius: 50%;
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 900px) {
+
+  .topbar {
+    min-height: 64px;
+
+    padding:
+      0 20px 0 70px;
+
+    gap: 12px;
+  }
+
+  .topbar-title {
+    font-size: 17px;
+  }
+
+  .topbar-search input {
+    width: 150px;
+  }
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+
+  .topbar {
+    min-height: 60px;
+
+    padding:
+      0 12px 0 64px;
+
+    gap: 10px;
+  }
+
+  .topbar-title {
+    font-size: 16px;
+
+    letter-spacing: -0.3px;
+  }
+
+  .topbar-badge {
+    display: none;
+  }
+
+  .topbar-right {
+    gap: 3px;
+  }
+
+  .topbar-search {
+    width: 36px;
+
+    height: 36px;
+
+    padding: 0;
+
+    justify-content: center;
+
+    border: none;
+
+    background: transparent;
+  }
+
+  .topbar-search input {
+    display: none;
+  }
+
+  .topbar-search:focus-within {
+    background: transparent;
+
+    border: none;
+
+    box-shadow: none;
+  }
+
+  .topbar-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .topbar-avatar-button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .topbar-avatar {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+
+/* =========================================
+   VERY SMALL PHONES
+========================================= */
+
+@media (max-width: 400px) {
+
+  .topbar {
+    padding-left: 60px;
+  }
+
+  .topbar-title {
+    max-width: 115px;
+
+    font-size: 15px;
+  }
+
+  .topbar-search {
+    display: none;
+  }
+}
+
+
+/* =========================================
+   REDUCED MOTION
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .topbar,
+  .topbar-search,
+  .topbar-icon,
+  .topbar-avatar-button {
+    transition: none;
+  }
 }
