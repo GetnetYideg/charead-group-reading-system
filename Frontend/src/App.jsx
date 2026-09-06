@@ -36,14 +36,14 @@ function AppRoutes() {
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
-      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-      <Route path="/groups" element={<ProtectedRoute><Groups /></ProtectedRoute>} />
-      <Route path="/groups/:slug" element={<ProtectedRoute><GroupWorkspace /></ProtectedRoute>} />
-      <Route path="/groups/:slug/chat" element={<ProtectedRoute><GroupChat /></ProtectedRoute>} />
-      <Route path="/inbox" element={<ProtectedRoute><Inbox /></ProtectedRoute>} />
-      <Route path="/ai" element={<ProtectedRoute><AIAssistant /></ProtectedRoute>} />
-      <Route path="/reader/:fileId" element={<ProtectedRoute><PDFReader /></ProtectedRoute>} />
-      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/dashboard" element={<PublicRoute><Dashboard /></PublicRoute>} />
+      <Route path="/groups" element={<PublicRoute><Groups /></PublicRoute>} />
+      <Route path="/groups/:slug" element={<PublicRoute><GroupWorkspace /></PublicRoute>} />
+      <Route path="/groups/:slug/chat" element={<PublicRoute><GroupChat /></PublicRoute>} />
+      <Route path="/inbox" element={<PublicRoute><Inbox /></PublicRoute>} />
+      <Route path="/ai" element={<PublicRoute><AIAssistant /></PublicRoute>} />
+      <Route path="/reader/:fileId" element={<PublicRoute><PDFReader /></PublicRoute>} />
+      <Route path="/profile" element={<PublicRoute><Profile /></PublicRoute>} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   )
