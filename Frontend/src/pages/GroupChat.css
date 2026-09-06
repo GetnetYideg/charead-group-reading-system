@@ -133,6 +133,5 @@
   gap: 14px;
 }
 
-.chat-context-card {}
-.chat-members-card {}
+
 .chat-member-row { display: flex; align-items: center; gap: 10px; }
