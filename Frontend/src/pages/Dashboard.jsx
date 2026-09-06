@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -67,7 +66,6 @@ function Modal({ title, onClose, children }) {
   )
 }
 
-
 export default function Dashboard() {
 
   const { user } = useAuth()
@@ -101,11 +99,6 @@ export default function Dashboard() {
   const [submitting, setSubmitting] =
     useState(false)
 
-
-  /* =========================================
-     LOAD GROUPS
-  ========================================= */
-
   useEffect(() => {
     loadGroups()
   }, [])
@@ -133,12 +126,6 @@ export default function Dashboard() {
 
     }
   }
-
-
-  /* =========================================
-     SEARCH GROUPS
-  ========================================= */
-
   const handleSearch = (q) => {
 
     if (!q) {
@@ -163,11 +150,6 @@ export default function Dashboard() {
       )
     )
   }
-
-
-  /* =========================================
-     CREATE GROUP
-  ========================================= */
 
   const handleCreate = async (e) => {
 
@@ -212,11 +194,6 @@ export default function Dashboard() {
     }
   }
 
-
-  /* =========================================
-     SEARCH FOR GROUP TO JOIN
-  ========================================= */
-
   const handleSearchSlug = async (val) => {
 
     setJoinSlug(val)
@@ -249,11 +226,6 @@ export default function Dashboard() {
 
     }
   }
-
-
-  /* =========================================
-     JOIN GROUP
-  ========================================= */
 
   const handleJoin = async (slug) => {
 
@@ -307,16 +279,7 @@ export default function Dashboard() {
 
     <div className="app-layout">
 
-      {/* =====================================
-          SIDEBAR
-      ===================================== */}
-
       <Sidebar />
-
-
-      {/* =====================================
-          MAIN CONTENT
-      ===================================== */}
 
       <div className="main-content">
 
@@ -325,13 +288,7 @@ export default function Dashboard() {
           searchPlaceholder="Search groups…"
           onSearch={handleSearch}
         />
-
-
         <main className="page-body">
-
-          {/* =================================
-              COLLABORATIVE SPACES HEADER
-          ================================= */}
 
           <div className="dash-section-header">
 
@@ -377,11 +334,6 @@ export default function Dashboard() {
             </div>
 
           </div>
-
-
-          {/* =================================
-              TOP GROUP CARDS
-          ================================= */}
 
           <div className="dash-grid">
 
@@ -446,7 +398,6 @@ export default function Dashboard() {
 
                   </div>
 
-
                   <div className="dash-group-info">
 
                     <h3>
@@ -491,12 +442,6 @@ export default function Dashboard() {
             )}
 
           </div>
-
-
-          {/* =================================
-              YOUR GROUPS
-          ================================= */}
-
           <div className="dash-your-groups">
 
             <h2 className="dash-section-title dash-your-groups-title">
@@ -585,11 +530,6 @@ export default function Dashboard() {
 
       </div>
 
-
-      {/* =====================================
-          CREATE GROUP MODAL
-      ===================================== */}
-
       {showCreate && (
 
         <Modal
@@ -662,11 +602,6 @@ export default function Dashboard() {
 
       )}
 
-
-      {/* =====================================
-          JOIN GROUP MODAL
-      ===================================== */}
-
       {showJoin && (
 
         <Modal
@@ -712,7 +647,6 @@ export default function Dashboard() {
             </p>
 
           )}
-
 
           {searchResults.length > 0 && (
 
